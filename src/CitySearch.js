@@ -1,58 +1,42 @@
-import React, { Component } from 'react';
-import axios from "axios";
 
+import React, { Component } from 'react'
+import axios from 'axios'
 class CitySearch extends Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      cityName: '',
-      zipArr: [],
+    constructor(props){
+        super(props);
+        this.state = {
+            zipArr: []      
+        }
     }
+
+    handleChange = (event) =>{
+        
+      let cityName = event.target.value.toUpperCase();
+      let link = 'http://ctp-zip-api.herokuapp.com/city/'+ cityName;
+       
+      axios
+      .get(link)
+      .then((response) => {
+        // data is an array containing objects
+        const data = response.data;
+        this.setState({ zipArr: data}); // transforming data into array
+        console.log(this.state.zipArr)
+      })
+      .catch((err) => console.log(err));
   }
 
 
-componentDidUpdate() {
-  
-  let cityName = this.state.cityName;
-  
-  const url = `http://ctp-zip-api.herokuapp.com/city/${cityName}`;
-  // console.log(url);
-  axios
-    .get(url)
-    .then((response) => {
-      const data = response.data;
-      console.log(cityName);
-      this.setState({zipArr: data});
-    })
-    .catch((err) => console.log(err));
-}
-handleChange = (event) => {
-  this.setState({ cityName: event.target.value.toUpperCase()})
-}
 
-
-render() {
-  let zipList = this.state.zipArr.map(zip =>{
-   return <li>{zip}</li>
-  });
-
-  return(
-    
-    <div>
-      
-      <h1>City: {this.state.cityName} </h1>
-      <input type = "text" placeholder = "Enter City Name Here" 
-      onChange={ this.handleChange} />
-      {/* <div>
-        <button onClick = {this.save} ></button>
-      </div> */}
-      
-
-      <ul>{zipList}</ul>
-      
-    </div>
-  )
-}
+    render(){
+    var zipList = this.state.zipArr.sort().map(zip=> <a>"{zip}", </a>);
+        return(
+            <div>
+                <h1>City Name:</h1>
+                <input type="text" placeholder="Enter City Name Here" onChange={ this.handleChange }/> 
+                <p>{zipList}</p>
+            </div>  
+        )
+    }
 }
 
 export default CitySearch;
